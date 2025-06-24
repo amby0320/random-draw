@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>隨機抽籤</title>
+  <style>
+    body {
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px;
+      box-sizing: border-box;
+    }
+
+    h1 {
+      color: #fff;
+      margin-bottom: 20px;
+    }
+
+    textarea {
+      width: 300px;
+      height: 150px;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      resize: none;
+      font-size: 16px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 12px 30px;
+      font-size: 18px;
+      border: none;
+      border-radius: 50px;
+      background: #007bff;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    #result {
+      margin-top: 40px;
+      font-size: 30px;
+      font-weight: bold;
+      color: #fff;
+      background: rgba(0,0,0,0.2);
+      padding: 20px 40px;
+      border-radius: 20px;
+      opacity: 0;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    #result.show {
+      opacity: 1;
+      transform: scale(1.2);
+    }
+  </style>
+</head>
+<body>
+  <h1>✨ 隨機抽籤 ✨</h1>
+  <p style="color: #fff;">每行一個抽籤項目，會自動儲存：</p>
+  <textarea id="items" placeholder="請輸入抽籤項目..."></textarea><br />
+  <button onclick="draw()">抽籤！</button>
+  <div id="result"></div>
+
+  <!-- 背景音效 -->
+  <audio id="sound" src="https://cdn.pixabay.com/audio/2022/08/04/audio_47fba0869f.mp3"></audio>
+
+  <script>
+    const textarea = document.getElementById('items');
+    const resultDiv = document.getElementById('result');
+    const sound = document.getElementById('sound');
+
+    // 載入儲存的項目
+    window.onload = function() {
+      const saved = localStorage.getItem('items');
+      if (saved) {
+        textarea.value = saved;
+      }
+    }
+
+    // 自動儲存
+    textarea.addEventListener('input', () => {
+      localStorage.setItem('items', textarea.value);
+    });
+
+    function draw() {
+      const items = textarea.value.split('\n').map(s => s.trim()).filter(s => s);
+      if (items.length === 0) {
+        alert('請先輸入至少一個項目！');
+        return;
+      }
+
+      // 隨機選擇
+      const randomIndex = Math.floor(Math.random() * items.length);
+      const result = items[randomIndex];
+
+      // 播放音效
+      sound.currentTime = 0;
+      sound.play();
+
+      // 顯示結果 + 動畫
+      resultDiv.textContent = '🎉 抽中: ' + result + ' 🎉';
+      resultDiv.classList.remove('show');
+      void resultDiv.offsetWidth; // 觸發 reflow
+      resultDiv.classList.add('show');
+    }
+  </script>
+</body>
+</html>
